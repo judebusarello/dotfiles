@@ -1,0 +1,32 @@
+Config { font = "-*-Fixed-Bold-R-Normal-*-15-*-*-*-*-*-*-*"
+       , bgColor = "#1c1c1c"
+       , fgColor = "white"
+       , position = BottomSize L 180 20
+       , border = TopB
+       , borderColor = "#9e5641"
+       , borderWidth = 5
+       , commands = [ Run Weather "KYAV" ["-t"," <tempF>F","-L","64","-H","77","--normal","#6f9aa6"] 36000
+                    , Run Cpu ["-L","3","-H","50"] 10
+                    , Run Memory ["-t","Mem: <usedratio>%"] 10
+                    -- , Run Swap [] 10
+                    , Run Date "%a %b %_d %l:%M" "date" 10
+                    , Run StdinReader
+                    , Run Battery        [ "--template" , "Battery: <acstatus>"
+                             , "--Low"      , "10"        -- units: %
+                             , "--High"     , "80"        -- units: %
+                             -- , "--low"      , "darkred"
+                             -- , "--normal"   , "darkorange"
+                             -- , "--high"     , "darkgreen"
+
+                             , "--" -- battery specific options
+                                       -- discharging status
+                                       , "-o"	, "<left>%"
+                                       -- AC "on" status
+                                       , "-O"	, "<left>% (Charging)"
+                                       -- charged status
+                                       , "-i"	, "Charged"
+                             ] 50
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "  <fc=#4c8ea1>%cpu%</fc> | <fc=#9e5641>%memory%</fc> | <fc=#bfb556>%battery%</fc> |<fc=#90a872>%KYAV%</fc> }{ <fc=#4c8ea1>%StdinReader%</fc> | <fc=#ffffff>%date%</fc>  "}
