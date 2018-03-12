@@ -1,0 +1,68 @@
+set use_from = yes
+set envelope_from = yes
+
+set timeout=10
+
+# G to get mail
+bind index G imap-fetch-mail
+
+#set ssl_force_tls = yes
+set editor = "vim"
+set charset = "utf-8"
+
+set imap_user = 'jude.busarello@vistarmedia.com'
+set imap_pass = "SECRET"
+
+set sendmail="/usr/sbin/ssmtp"
+
+set folder="imaps://imap.gmail.com"
+set spoolfile="imaps://imap.gmail.com/INBOX"
+set record="imaps://imap.gmail.com/[Gmail]/Sent Mail"
+set postponed="imaps://imap.gmail.com/[Gmail]/Drafts"
+
+set header_cache = "~/.mutt/cache/headers"
+set message_cachedir = "~/.mutt/cache/bodies"
+set certificate_file = "~/.mutt/certificates"
+
+set realname = "Jude Busarello"
+set from = "jude.busarello@vistarmedia.com"
+
+set smtp_url = 'smtp://jude.busarello@smtp.gmail.com:587/'
+set smtp_pass = "SECRET"
+
+set sort="threads"
+set strict_threads="yes"
+
+set sort_browser="reverse-date"
+set sort_aux="last-date-received"
+unset collapse_unread
+
+bind index z collapse-thread
+bind index Z collapse-all
+
+set wait_key="no"
+
+
+alternative_order text/plain text/html
+auto_view text/html
+set mailcap_path = ~/.mutt/mailcap
+
+bind pager j next-line
+bind pager k previous-line
+bind attach,index,pager \CD next-page
+bind attach,index,pager \CU previous-page
+bind pager g top
+bind pager G bottom
+bind attach,index g first-entry
+bind attach,index G last-entry
+
+# Mailboxes to show in the sidebar.
+mailboxes "+-- GMail---------------" \
+          +GMail/INBOX \
+          +GMail/AWS\ Alerts \
+          +GMail/Code\ Review \
+          +GMail/Datadog\ Reports \
+          +Gmail/Geocode\.io \
+          +Gmail/Gerrit\ Summary \
+          +Gmail/Industry\ News \
+          +Gmail/Tickets \
