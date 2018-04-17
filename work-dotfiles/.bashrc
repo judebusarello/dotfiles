@@ -102,6 +102,11 @@ alias AG='~/Scripts/Inventory/allgrep.sh'
 alias CG='~/Scripts/Inventory/codegrep.sh'
 alias tmux='TERM=xterm-256color /usr/bin/tmux'
 alias vim='gvim -v'
+alias log='git log --oneline --decorate --all --graph'
+alias slog='git log --oneline --decorate --all --graph --simplify-by-decoration'
+
+function glog { git log -G "$1" --graph --oneline --stat --pickaxe-all; }
+export -f glog
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -140,3 +145,74 @@ export SSH_USER="jbusarello"
 [ -n "$PS1" ] && sh ~/.nightshell/simplifysimplify-dark
 eval `dircolors ~/.nightshell/dircolors`
 
+export BROWSER="chromium-browser"
+
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# GIT heart FZF
+# -------------
+
+is_in_git_repo() {
+  git rev-parse HEAD > /dev/null 2>&1
+}
+
+# FZF for files that you changed in the git repo
+gf() {
+  is_in_git_repo || return
+  git -c color.status=always status --short |
+  fzf-tmux -m --ansi --nth 2..,.. \
+    --preview 'NAME="$(cut -c4- <<< {})" &&
+               (git diff --color=always "$NAME" | sed 1,4d; cat "$NAME") | head -200' |
+  cut -c4-
+}
+
+# FZF for branches of current thing
+gb() {
+  is_in_git_repo || return
+  git branch -a --color=always | grep -v '/HEAD\s' | sort |
+  fzf-tmux --ansi --multi --tac --preview-window right:70% \
+    --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -200' |
+  sed 's/^..//' | cut -d' ' -f1 |
+  sed 's#^remotes/##'
+}
+
+# FZF for tags of current thing
+gt() {
+  is_in_git_repo || return
+  git tag --sort -version:refname |
+  fzf-tmux --multi --preview-window right:70% \
+    --preview 'git show --color=always {} | head -200'
+}
+
+# FZF commits of current branch
+gh() {
+  is_in_git_repo || return
+  git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph |
+  fzf-tmux --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
+    --header 'Press CTRL-S to toggle sort' \
+    --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always | head -200' |
+  grep -o "[a-f0-9]\{7,\}"
+}
+
+fzf_dirty_files() {
+  git status --porcelain | cut -c 1,2,3 --complement | fzf --multi --preview-window=up:50% --preview='git diff --color=always {}'
+}
+
+fzf_last_commit_dirty_files() {
+  git status --porcelain | cut -c 1,2,3 --complement | fzf --multi --preview-window=up:50% --preview='git diff HEAD\^ --color=always {}'
+}
+
+bind '"\er": redraw-current-line'
+bind '"\C-g\C-f": "$(gf)\e\C-e\er"'
+bind '"\C-g\C-b": "$(gb)\e\C-e\er"'
+bind '"\C-g\C-t": "$(gt)\e\C-e\er"'
+bind '"\C-g\C-h": "$(gh)\e\C-e\er"'
+bind '"\C-g\C-g": "$(fzf_dirty_files)\e\C-e\er"'
+bind '"\C-g\C-f": "$(fzf_last_commit_dirty_files)\e\C-e\er"'
+
+# Said it'd speed it up?
+export FZF_DEFAULT_COMMAND='
+  (git ls-tree -r --name-only HEAD ||
+   find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+      sed s/^..//) 2> /dev/null'

@@ -5,10 +5,8 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 Plug 'airblade/vim-gitgutter'
 Plug 'edkolev/tmuxline.vim'
 Plug 'kchmck/vim-coffee-script'
-Plug 'kien/ctrlp.vim'
 Plug 'majutsushi/tagbar'
 Plug 'ntpeters/vim-better-whitespace'
-Plug 'scrooloose/nerdtree'
 Plug 'sjl/gundo.vim'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
@@ -17,6 +15,17 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'dkprice/vim-easygrep'
 Plug 'lambdalisue/vim-fullscreen'
 Plug 'leafgarland/typescript-vim'
+Plug 'dikiaap/minimalist'
+Plug 'tmux-plugins/vim-tmux-focus-events'
+Plug 'arcticicestudio/nord-vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'junegunn/goyo.vim'
+""Plug 'miyakogi/sidepanel.vim'
+""Plug 'mhinz/vim-startify'
+""Plug 'bagrat/vim-workspace'
+""Plug 'nanotech/jellybeans.vim'
 ""Plug 'kristijanhusak/vim-hybrid-material'
 ""Plug 'nightsense/carbonized'
 ""Plug 'mkarmona/colorsbox'
@@ -25,8 +34,9 @@ Plug 'leafgarland/typescript-vim'
 ""Plug 'tyrannicaltoucan/vim-quantum'
 ""Plug 'chriskempson/vim-tomorrow-theme'
 ""Plug 'chriskempson/base16-vim'
-Plug 'dikiaap/minimalist'
-Plug 'tmux-plugins/vim-tmux-focus-events'
+""Plug 'scrooloose/nerdtree'
+""Plug 'Shougo/denite.nvim'
+Plug 'dylanaraps/crayon'
 call plug#end()
 
 syntax on
@@ -76,9 +86,6 @@ set background=dark
 set autoread
 au FocusGained,BufEnter * :silent! !
 
-nnoremap <Leader>o :NERDTreeFind<CR>
-nnoremap <Leader>O :NERDTreeToggle<CR>
-
 "" autocmd QuickFixCmdPost *grep* cwindow
 
 let g:tagbar_type_typescript = {
@@ -100,20 +107,32 @@ let g:tagbar_type_typescript = {
   \ 'sort' : 0
   \ }
 
-let g:ctrlp_by_filename = 0
-let g:ctrlp_switch_buffer = 'ETVH'
 
-nnoremap <Leader>J <C-]>
-nnoremap <Leader>K <C-t>
+" ================ File Navigation ====================
+"
+let g:ctrlp_by_filename = 0                                                     "Search by filename instead of full path
+let g:ctrlp_switch_buffer = 'ETVH'                                              "If buffer is already open, jump to it
+:nnoremap <Tab> :bnext<CR>
+:nnoremap <S-Tab> :bprevious<CR>
+:nnoremap <C-X> :bdelete<CR>
+nmap <C-b> :CtrlPBuffer<CR>
 
-let NERDTreeMinimalUI=1
-let NERDTreeQuitOnOpen=1
-let NERDTreeDirArrows = 1
-let g:NERDTreeWinSize=45
+:nnoremap <S-Space> <C-]>
+:nnoremap <S-BackSpace> <C-t>
+
+" =================== Sidebars =======================
+"
+" let NERDTreeMinimalUI=1
+" let NERDTreeQuitOnOpen=1
+" let NERDTreeDirArrows = 1
+" let g:NERDTreeWinSize=45
 let g:tagbar_compact=1
 let g:tagbar_hide_nonpublic=1
-let g:tagbar_left = 1
 let g:tagbar_width=45
+noremap <S-U> :GundoToggle<CR>
+nnoremap <Leader>t :TagbarToggle<CR>
+nnoremap <Leader>o :NERDTreeToggle<CR>
+nnoremap <Leader>O :NERDTreeFind<CR>
 
 " " Sync Nerdtree when switching buffers
 " autocmd BufWinEnter * :NERDTreeFind
@@ -127,13 +146,14 @@ let g:tagbar_width=45
 
 set hidden
 
-" let g:airline#extensions#tabline#alt_sep = 1
-" let g:airline#extensions#tabline#show_buffers = 1
-" let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#alt_sep = 1
+let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#extensions#tabline#buffer_idx_mode = 1
 
-let g:airline_theme = "hybrid"
+"let g:airline_theme = "hybrid"
+let g:airline_theme = "minimalist"
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#enabled = 1
 
 let g:airline_section_y = '%{(&fenc == "" ? &enc : &fenc)}'                     "set encoding type info
 let g:airline_section_z = '%{substitute(getcwd(), expand("$HOME"), "~", "g")}'  "Set relative path
@@ -153,12 +173,12 @@ nmap <Leader>9 <Plug>AirlineSelectTab9
 nmap <leader>h <Plug>AirlineSelectPrevTab
 nmap <leader>l <Plug>AirlineSelectNextTab
 
-map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>. 
+map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>.
 
 " " HACKS for my shitty colorscheme
 "" highlight search term=bold cterm=bold ctermfg=blue ctermbg=10
 
-nnoremap <F5> :GundoToggle<CR>
+""nnoremap <F5> :GundoToggle<CR>
 
 set showmatch                                                                   "Highlight matching bracket
 set nostartofline                                                               "Jump to first non-blank character
@@ -220,12 +240,12 @@ syntax on                                                                       
 ""colorscheme hybrid_material
 ""colorscheme colorsbox-stnight
 
-autocmd FileType typescript :set makeprg='bazel build'
+"" autocmd FileType typescript :set makeprg='bazel build'
 
-let g:typescript_compiler_binary = ''
-let g:typescript_compiler_options = ''
-autocmd QuickFixCmdPost [^l]* nested cwindow
-autocmd QuickFixCmdPost    l* nested lwindow
+" let g:typescript_compiler_binary = ''
+" let g:typescript_compiler_options = ''
+" autocmd QuickFixCmdPost [^l]* nested cwindow
+" autocmd QuickFixCmdPost    l* nested lwindow
 
 "" whatev
 set colorcolumn=80
@@ -236,5 +256,112 @@ let g:loaded_netrwPlugin = 1
 ""let g:quantum_black=1
 ""let g:airline_theme='quantum'
 colorscheme minimalist
-let g:airline_theme='angr'
+""colorscheme crayon
+"" colorscheme nord
+""colorscheme jellybeans
+"let g:airline_theme='angr'
 " colorscheme base16-google-dark
+
+
+" let g:sidepanel_pos = "left"
+" " Set width if neccesary (default: 32)
+" let g:sidepanel_width = 45
+
+" " To use rabbit-ui.vim
+" let g:sidepanel_use_rabbit_ui = 1
+
+" Activate plugins in SidePanel
+" let g:sidepanel_config = {}
+" let g:sidepanel_config['nerdtree'] = {}
+" let g:sidepanel_config['tagbar'] = {}
+" let g:sidepanel_config['gundo'] = {}
+" let g:sidepanel_config['buffergator'] = {}
+" let g:sidepanel_config['vimfiler'] = {}
+
+let g:gundo_prefer_python3 = 1                                                  "allow gundo to work with only python3 installed
+
+noremap <Tab> :WSNext<CR>
+noremap <S-Tab> :WSPrev<CR>
+noremap <Leader><Tab> :WSClose<CR>
+noremap <Leader><S-Tab> :WSClose!<CR>
+noremap <C-t> :WSTabNew<CR>
+
+cabbrev bonly WSBufOnly
+
+" let g:workspace_powerline_separators = 1
+" let g:workspace_tab_icon = "\uf00a"
+" let g:workspace_left_trunc_icon = "\uf0a8"
+" let g:workspace_right_trunc_icon = "\uf0a9"
+
+nnoremap <Leader>VV <C-]>
+nnoremap <Leader>T <C-t>
+
+autocmd FileType qf wincmd J                                                    "Fix for quickfix window appearing within tagbar
+
+nmap <Leader>l <Plug>(Limelight)
+xmap <Leader>l <Plug>(Limelight)
+
+nnoremap <C-g> :Goyo<CR>
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+
+nmap     <Leader>g :Gstatus<CR>gg<c-n>
+""nnoremap <Leader>d :Gdiff<CR>
+""nnoremap <Leader>D :Gdiff HEAD^<CR>
+nnoremap <Leader>c :BCommits<CR>
+
+nnoremap <Leader>b :BLines<CR>
+nnoremap <C-b> :Buffers<CR>
+nnoremap <C-t> :Tags<CR>
+nnoremap <C-s> :Goyo<CR>
+
+" Lets FZF grep.
+" Requires both FZF and RipGrep to be installed on the host system
+nnoremap <Leader>g :Rg<Cr>
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%', '?'),
+  \   <bang>0)
+
+" command! -bang -nargs=* Rg
+"   \ call fzf#vim#grep(
+"   \       'rg --column --line-number --no-heading --color=always --smart-case --fixed-strings'.shellescape(<q-args>).' $(git rev-parse --show-toplevel 2> /dev/null)', 0,
+"   \       {'options': '--no-hscroll --delimiter : --nth 4..'},
+"   \       <bang>0)
+
+
+" Reads all the files in the git repo. Used for grepping with FZF.
+nnoremap <C-p> :ProjectFiles<CR>
+
+command! -bang -nargs=? -complete=dir GitFiles
+  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+command! ProjectFiles execute 'GitFiles' s:find_git_root()
+function! s:find_git_root()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
+" " Reads all the files in the git repo. Used for grepping with FZF.
+" nnoremap <Leader>f :StagedFiles<CR>
+" command! -bang -nargs=* StagedFiles
+"   \ call fzf#vim#grep(
+"   \       'rg --column --line-number --no-heading --color=always --smart-case --fixed-strings'.shellescape(<q-args>), 0,
+"   \       {'options': '--no-hscroll --delimiter : --nth 4..'},
+"   \       <bang>0)
+
+
+nnoremap <Leader>a :FZFNeigh<CR>
+command! FZFNeigh call s:fzf_neighbouring_files()
+function! s:fzf_neighbouring_files()
+  let current_file = expand("%")
+  let cwd = fnamemodify(current_file, ':p:h')
+  let command = 'rg --no-heading --smart-case --fixed-strings --files ' . cwd . ' --maxdepth 1'
+  call fzf#run({
+        \ 'source': command,
+        \ 'sink':   'e',
+        \ 'options': '-m -x +s',
+        \ 'window':  'enew' })
+endfunction
+
