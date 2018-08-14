@@ -1,48 +1,40 @@
 set nocompatible                                                                "This must be first, because it changes other options as a side effect.
 
 call plug#begin('~/.vim/plugged')
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
-Plug 'airblade/vim-gitgutter'
-Plug 'edkolev/tmuxline.vim'
+Plug 'airblade/vim-gitgutter'                                                   "Marks diffed lines between last commit in the current file
+Plug 'dikiaap/minimalist'                                                       "Colorscheme
+Plug 'easymotion/vim-easymotion'                                                "Jump directly to the character you are looking at
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }               "FZF, the GOAT fuzzy searcher
+Plug 'junegunn/fzf.vim'                                                         "FZF, the GOAT fuzzy searcher
 Plug 'kchmck/vim-coffee-script'
-Plug 'majutsushi/tagbar'
-Plug 'ntpeters/vim-better-whitespace'
-Plug 'sjl/gundo.vim'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-fugitive'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'dkprice/vim-easygrep'
-Plug 'lambdalisue/vim-fullscreen'
-Plug 'leafgarland/typescript-vim'
-Plug 'dikiaap/minimalist'
+Plug 'leafgarland/typescript-vim'                                               "Typescript syntax highlighting
+Plug 'ntpeters/vim-better-whitespace'                                           "Highlights trailing whitespace
+Plug 'takac/vim-hardtime'                                                       "Prevents you from using HJKL all the time
 Plug 'tmux-plugins/vim-tmux-focus-events'
-Plug 'arcticicestudio/nord-vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'junegunn/limelight.vim'
-Plug 'junegunn/goyo.vim'
-""Plug 'miyakogi/sidepanel.vim'
-""Plug 'mhinz/vim-startify'
-""Plug 'bagrat/vim-workspace'
-""Plug 'nanotech/jellybeans.vim'
-""Plug 'kristijanhusak/vim-hybrid-material'
-""Plug 'nightsense/carbonized'
-""Plug 'mkarmona/colorsbox'
-""Plug 'nightsense/seagrey'
-""Plug 'w0ng/vim-hybrid'
-""Plug 'tyrannicaltoucan/vim-quantum'
-""Plug 'chriskempson/vim-tomorrow-theme'
-""Plug 'chriskempson/base16-vim'
-""Plug 'scrooloose/nerdtree'
-""Plug 'Shougo/denite.nvim'
-Plug 'dylanaraps/crayon'
+Plug 'tpope/vim-commentary'                                                     "Hit g,c to comment or uncomment a block of code
+Plug 'tpope/vim-eunuch'                                                         "Use :Move :Delete and other command line file commands from within vim
+Plug 'tpope/vim-fugitive'                                                       "Needed to use FZF for branch searching/changing
+Plug 'wincent/terminus'                                                         "Switches the cursor depending on if you're in insert/normal/replace mode
 call plug#end()
 
-syntax on
-filetype plugin indent on
-let mapleader=""
-nmap <Leader><Leader> <c-^>
+
+" ======================== Experimental =====================================
+
+let g:hardtime_default_on = 1                                                   "Prevents you from using HJKL all the time (on)
+
+"Allows Easymotion to be called with 's'
+nmap s <Plug>(easymotion-s)
+
+" ======================== Vim Basic Config =================================
+
+colorscheme minimalist                                                          "Active colorscheme
+filetype plugin indent on                                                       "Guesses filetype for syntax highlighting and intentation on file load
+let mapleader=""                                                              "Maps the leader key to 'Enter'
+set lazyredraw                                                                  "Do not redraw on registers and macros
+set nostartofline                                                               "Jump to first non-blank character when entering new line
+set noswapfile                                                                  "Don't store swap files
+set showmatch                                                                   "Highlight matching bracket
+syntax on                                                                       "Syntax highlighting (on)
 
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -56,10 +48,9 @@ nnoremap <C-F> :vsplit<CR>
 set ignorecase
 set smartcase
 
-set noswapfile
-set backupdir=~/.vim/backup//
-set directory=~/.vim/swap//
-set undodir=~/.vim/undo//
+" set backupdir=~/.vim/backup//
+" set directory=~/.vim/swap//
+" set undodir=~/.vim/undo//
 
 set autochdir
 set number
@@ -77,7 +68,7 @@ nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR> "space clears the search
 set hlsearch
 set incsearch
 
-set updatetime=50 "helps tagbar update quicker
+" set updatetime=50 "helps tagbar update quicker
 
 set background=dark
 "" The lines below will refresh buffers according to the file on disk when you
@@ -86,39 +77,67 @@ set background=dark
 set autoread
 au FocusGained,BufEnter * :silent! !
 
-"" autocmd QuickFixCmdPost *grep* cwindow
-
-let g:tagbar_type_typescript = {
-  \ 'ctagsbin' : 'tstags',
-  \ 'ctagsargs' : '-f-',
-  \ 'kinds': [
-    \ 'e:enums:0:1',
-    \ 'f:function:0:1',
-    \ 't:typealias:0:1',
-    \ 'M:Module:0:1',
-    \ 'I:import:0:1',
-    \ 'i:interface:0:1',
-    \ 'C:class:0:1',
-    \ 'm:method:0:1',
-    \ 'p:property:0:1',
-    \ 'v:variable:0:1',
-    \ 'c:const:0:1',
-  \ ],
-  \ 'sort' : 0
-  \ }
 
 
 " ================ File Navigation ====================
-"
-let g:ctrlp_by_filename = 0                                                     "Search by filename instead of full path
-let g:ctrlp_switch_buffer = 'ETVH'                                              "If buffer is already open, jump to it
-:nnoremap <Tab> :bnext<CR>
-:nnoremap <S-Tab> :bprevious<CR>
-:nnoremap <C-X> :bdelete<CR>
-nmap <C-b> :CtrlPBuffer<CR>
 
-:nnoremap <S-Space> <C-]>
-:nnoremap <S-BackSpace> <C-t>
+" -----------------------------------------------------
+"
+" FZF all the files in the git repo
+nnoremap <C-p> :GitFiles<CR>
+command! -bang -nargs=? -complete=dir GitFiles
+  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview('right:60%'), <bang>0)
+
+" FZF all the definition tags in the git repo
+nnoremap <C-t> :Tags<CR>
+command! -bang -nargs=? -complete=dir Tags
+  \ call fzf#vim#tags(<q-args>, fzf#vim#with_preview('right:60%'), <bang>0)
+
+" FZF all the CONTENTS of the files in the git repo
+nmap ; :GitGrep<CR>
+nnoremap <Leader>g :GitGrep<Cr>
+command! -bang -nargs=* GitGrep
+  \ call fzf#vim#ag(<q-args>,
+  \  fzf#vim#with_preview({
+  \    'options': '--no-hscroll --delimiter : --nth 4..',
+  \    'dir': systemlist('git rev-parse --show-toplevel')[0]},
+  \    'right:60%'
+  \  ),
+  \  <bang>0)
+
+" FZF the files in the current folder
+nnoremap <Leader>a :FZFAdjacent<CR>
+command! FZFAdjacent call s:fzf_neighbouring_files()
+function! s:fzf_neighbouring_files()
+  let command = 'rg --hidden --no-heading --smart-case --fixed-strings --files --maxdepth 1 | sort'
+  let options = fzf#vim#with_preview('right:60%', '?').options
+  call fzf#run({
+        \ 'source': command,
+        \ 'sink':   'e',
+        \ 'options': options,
+        \ 'window':  'enew' })
+endfunction
+
+nnoremap <Leader>b :Gbranch<CR>
+command! -bang Gbranch call fzf#run({
+            \ 'source': 'git branch -a --no-color | grep -v "^\* " ',
+            \ 'sink': function('s:changebranch')
+            \ })
+function! s:changebranch(branch)
+    execute 'Git checkout' . a:branch
+    call feedkeys("i")
+endfunction
+
+nnoremap <C-b> :Buffers<CR>
+
+" ====================== Git Gutter =======================================
+
+" GitGutter styling to use · instead of +/-
+let g:gitgutter_sign_added = '◆'
+let g:gitgutter_sign_modified = '◆'
+let g:gitgutter_sign_modified_removed = '◆'
+let g:gitgutter_sign_removed = '◆'
+let g:gitgutter_sign_removed_first_line = '◆'
 
 " =================== Sidebars =======================
 "
@@ -126,13 +145,13 @@ nmap <C-b> :CtrlPBuffer<CR>
 " let NERDTreeQuitOnOpen=1
 " let NERDTreeDirArrows = 1
 " let g:NERDTreeWinSize=45
-let g:tagbar_compact=1
-let g:tagbar_hide_nonpublic=1
-let g:tagbar_width=45
-noremap <S-U> :GundoToggle<CR>
-nnoremap <Leader>t :TagbarToggle<CR>
-nnoremap <Leader>o :NERDTreeToggle<CR>
-nnoremap <Leader>O :NERDTreeFind<CR>
+" let g:tagbar_compact=1
+" let g:tagbar_hide_nonpublic=1
+" let g:tagbar_width=45
+" noremap <S-U> :UndotreeToggle<CR>
+" nnoremap <Leader>t :TagbarToggle<CR>
+" nnoremap <Leader>o :NERDTreeToggle<CR>
+" nnoremap <Leader>O :NERDTreeFind<CR>
 
 " " Sync Nerdtree when switching buffers
 " autocmd BufWinEnter * :NERDTreeFind
@@ -144,45 +163,42 @@ nnoremap <Leader>O :NERDTreeFind<CR>
 " the very bottom (see :help :wincmd and :help ^WJ).
 " autocmd FileType qf wincmd J
 
-set hidden
+" set hidden
 
-let g:airline#extensions#tabline#alt_sep = 1
-let g:airline#extensions#tabline#show_buffers = 1
-let g:airline#extensions#tabline#buffer_idx_mode = 1
+"let g:airline#extensions#tabline#alt_sep = 1
+"let g:airline#extensions#tabline#show_buffers = 1
+"let g:airline#extensions#tabline#buffer_idx_mode = 1
 
 "let g:airline_theme = "hybrid"
-let g:airline_theme = "minimalist"
-let g:airline_powerline_fonts = 1
+"let g:airline_theme = "minimalist"
+"let g:airline_powerline_fonts = 1
 " let g:airline#extensions#tabline#enabled = 1
 
-let g:airline_section_y = '%{(&fenc == "" ? &enc : &fenc)}'                     "set encoding type info
-let g:airline_section_z = '%{substitute(getcwd(), expand("$HOME"), "~", "g")}'  "Set relative path
-let g:airline#extensions#whitespace#enabled = 0                                 "Disable whitespace extension
-let g:airline#extensions#tabline#left_sep = ' '                                 "Left separator for tabline
-let g:airline#extensions#tabline#left_alt_sep = '│'                             "Right separator for tabline
+" let g:airline_section_y = '%{(&fenc == "" ? &enc : &fenc)}'                     "set encoding type info
+" let g:airline_section_z = '%{substitute(getcwd(), expand("$HOME"), "~", "g")}'  "Set relative path
+" let g:airline#extensions#whitespace#enabled = 0                                 "Disable whitespace extension
+" let g:airline#extensions#tabline#left_sep = ' '                                 "Left separator for tabline
+" let g:airline#extensions#tabline#left_alt_sep = '│'                             "Right separator for tabline
 
-nmap <Leader>1 <Plug>AirlineSelectTab1
-nmap <Leader>2 <Plug>AirlineSelectTab2
-nmap <Leader>3 <Plug>AirlineSelectTab3
-nmap <Leader>4 <Plug>AirlineSelectTab4
-nmap <Leader>5 <Plug>AirlineSelectTab5
-nmap <Leader>6 <Plug>AirlineSelectTab6
-nmap <Leader>7 <Plug>AirlineSelectTab7
-nmap <Leader>8 <Plug>AirlineSelectTab8
-nmap <Leader>9 <Plug>AirlineSelectTab9
-nmap <leader>h <Plug>AirlineSelectPrevTab
-nmap <leader>l <Plug>AirlineSelectNextTab
+" nmap <Leader>1 <Plug>AirlineSelectTab1
+" nmap <Leader>2 <Plug>AirlineSelectTab2
+" nmap <Leader>3 <Plug>AirlineSelectTab3
+" nmap <Leader>4 <Plug>AirlineSelectTab4
+" nmap <Leader>5 <Plug>AirlineSelectTab5
+" nmap <Leader>6 <Plug>AirlineSelectTab6
+" nmap <Leader>7 <Plug>AirlineSelectTab7
+" nmap <Leader>8 <Plug>AirlineSelectTab8
+" nmap <Leader>9 <Plug>AirlineSelectTab9
+" nmap <leader>h <Plug>AirlineSelectPrevTab
+" nmap <leader>l <Plug>AirlineSelectNextTab
 
-map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>.
+" map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>.
 
 " " HACKS for my shitty colorscheme
 "" highlight search term=bold cterm=bold ctermfg=blue ctermbg=10
 
 ""nnoremap <F5> :GundoToggle<CR>
 
-set showmatch                                                                   "Highlight matching bracket
-set nostartofline                                                               "Jump to first non-blank character
-set lazyredraw                                                                  "Do not redraw on registers and macros
 
 
 "" EXPERIMENTING
@@ -190,11 +206,11 @@ set lazyredraw                                                                  
 
 " ================ GUI options ====================
 
-set guioptions-=m                                                               "remove menu bar
-set guioptions-=T                                                               "remove toolbar
-set guioptions-=L                                                               "remove left scrollbar when vertical split
-set guioptions-=r                                                               "remove left scrollbar when vertical split
-set guioptions-=l                                                               "remove left scrollbar
+" set guioptions-=m                                                               "remove menu bar
+" set guioptions-=T                                                               "remove toolbar
+" set guioptions-=L                                                               "remove left scrollbar when vertical split
+" set guioptions-=r                                                               "remove left scrollbar when vertical split
+" set guioptions-=l                                                               "remove left scrollbar
 ""set guifont=InconsolataForPowerline\ Nerd\ Font\ Medium\ 8                     "font setup
 ""set linespace=1                                                                "Set lineheight in gvim
 
@@ -209,11 +225,12 @@ set undofile
 " ================ General Config ====================
 
 set t_Co=256                                                                    "Set 256 colors
-set title                                                                       "change the terminal's title
 set backspace=indent,eol,start                                                  "Allow backspace in insert mode
 set history=500                                                                 "Store lots of :cmdline history
-set showcmd                                                                     "Show incomplete cmds down the bottom
 set noshowmode                                                                  "Hide showmode because of the powerline plugin
+set noruler
+set laststatus=0
+set noshowcmd                                                                   "Show incomplete cmds down the bottom
 set gdefault                                                                    "Set global flag for search and replace
 set gcr=a:blinkon500-blinkwait500-blinkoff500                                   "Set cursor blinking rate
 set cursorline                                                                  "Highlight current line
@@ -226,7 +243,7 @@ set linebreak                                                                   
 set listchars=tab:\ \ ,trail:·                                                  "Set trails for tabs and spaces
 set list                                                                        "Enable listchars
 set completeopt-=preview                                                        "Disable preview for autocomplete
-set conceallevel=2 concealcursor=i                                              "neosnippets conceal marker
+" set conceallevel=2 concealcursor=i                                              "neosnippets conceal marker
 
 syntax on                                                                       "turn on syntax highlighting
 "" colorscheme base16-material-dark
@@ -249,13 +266,12 @@ syntax on                                                                       
 
 "" whatev
 set colorcolumn=80
-let g:loaded_netrw = 1
-let g:loaded_netrwPlugin = 1
+" let g:loaded_netrw = 1
+" let g:loaded_netrwPlugin = 1
 
 ""colorscheme quantum
 ""let g:quantum_black=1
 ""let g:airline_theme='quantum'
-colorscheme minimalist
 ""colorscheme crayon
 "" colorscheme nord
 ""colorscheme jellybeans
@@ -278,15 +294,15 @@ colorscheme minimalist
 " let g:sidepanel_config['buffergator'] = {}
 " let g:sidepanel_config['vimfiler'] = {}
 
-let g:gundo_prefer_python3 = 1                                                  "allow gundo to work with only python3 installed
+" let g:gundo_prefer_python3 = 1                                                  "allow gundo to work with only python3 installed
 
-noremap <Tab> :WSNext<CR>
-noremap <S-Tab> :WSPrev<CR>
-noremap <Leader><Tab> :WSClose<CR>
-noremap <Leader><S-Tab> :WSClose!<CR>
-noremap <C-t> :WSTabNew<CR>
+" noremap <Tab> :WSNext<CR>
+" noremap <S-Tab> :WSPrev<CR>
+" noremap <Leader><Tab> :WSClose<CR>
+" noremap <Leader><S-Tab> :WSClose!<CR>
+" noremap <C-t> :WSTabNew<CR>
 
-cabbrev bonly WSBufOnly
+" cabbrev bonly WSBufOnly
 
 " let g:workspace_powerline_separators = 1
 " let g:workspace_tab_icon = "\uf00a"
@@ -296,72 +312,100 @@ cabbrev bonly WSBufOnly
 nnoremap <Leader>VV <C-]>
 nnoremap <Leader>T <C-t>
 
-autocmd FileType qf wincmd J                                                    "Fix for quickfix window appearing within tagbar
+" autocmd FileType qf wincmd J                                                    "Fix for quickfix window appearing within tagbar
 
-nmap <Leader>l <Plug>(Limelight)
-xmap <Leader>l <Plug>(Limelight)
+" nmap <Leader>l <Plug>(Limelight)
+" xmap <Leader>l <Plug>(Limelight)
 
-nnoremap <C-g> :Goyo<CR>
-autocmd! User GoyoEnter Limelight
-autocmd! User GoyoLeave Limelight!
+" let g:goyo_width = 120
+" let g:goyo_height = 90
+" let g:goyo_linenr = 1
+" nnoremap <C-g> :Goyo<CR>
+" autocmd! User GoyoEnter Limelight
+" autocmd! User GoyoLeave Limelight!
 
-nmap     <Leader>g :Gstatus<CR>gg<c-n>
+" nmap     <Leader>g :Gstatus<CR>gg<c-n>
 ""nnoremap <Leader>d :Gdiff<CR>
 ""nnoremap <Leader>D :Gdiff HEAD^<CR>
+" nnoremap <C-s> :Goyo<CR>
 nnoremap <Leader>c :BCommits<CR>
 
-nnoremap <Leader>b :BLines<CR>
-nnoremap <C-b> :Buffers<CR>
-nnoremap <C-t> :Tags<CR>
-nnoremap <C-s> :Goyo<CR>
-
-" Lets FZF grep.
-" Requires both FZF and RipGrep to be installed on the host system
-nnoremap <Leader>g :Rg<Cr>
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%', '?'),
-  \   <bang>0)
-
-" command! -bang -nargs=* Rg
-"   \ call fzf#vim#grep(
-"   \       'rg --column --line-number --no-heading --color=always --smart-case --fixed-strings'.shellescape(<q-args>).' $(git rev-parse --show-toplevel 2> /dev/null)', 0,
-"   \       {'options': '--no-hscroll --delimiter : --nth 4..'},
-"   \       <bang>0)
+"nnoremap <Leader>b :BLines<CR>
 
 
-" Reads all the files in the git repo. Used for grepping with FZF.
-nnoremap <C-p> :ProjectFiles<CR>
-
-command! -bang -nargs=? -complete=dir GitFiles
-  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
-
-command! ProjectFiles execute 'GitFiles' s:find_git_root()
-function! s:find_git_root()
-  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
-endfunction
-
-" " Reads all the files in the git repo. Used for grepping with FZF.
-" nnoremap <Leader>f :StagedFiles<CR>
-" command! -bang -nargs=* StagedFiles
-"   \ call fzf#vim#grep(
-"   \       'rg --column --line-number --no-heading --color=always --smart-case --fixed-strings'.shellescape(<q-args>), 0,
-"   \       {'options': '--no-hscroll --delimiter : --nth 4..'},
-"   \       <bang>0)
 
 
-nnoremap <Leader>a :FZFNeigh<CR>
-command! FZFNeigh call s:fzf_neighbouring_files()
-function! s:fzf_neighbouring_files()
-  let current_file = expand("%")
-  let cwd = fnamemodify(current_file, ':p:h')
-  let command = 'rg --no-heading --smart-case --fixed-strings --files ' . cwd . ' --maxdepth 1'
+nnoremap <C-x> :BTags<CR>
+
+
+""rg -g '*.{toml,md,yml}' -c ripgrep
+
+" nnoremap <Leader>d :FZFDirty<CR>
+" command! FZFDirty call s:fzf_dirty_files()
+" function! s:fzf_dirty_files()
+"   let command = 'git status -s | cut -c4-'
+"   let options = fzf#vim#with_preview('up:80%', '?').options
+
+"   call fzf#run({
+"         \ 'source': command,
+"         \ 'sink':   'e',
+"         \ 'options': options,
+"         \ 'window':  'enew' })
+
+" endfunction
+
+" let s:bin_dir = expand('<sfile>:h:h:h').'home/judebusarello/.vim/plugged/fzf.vim/bin/'
+" let s:bin = {'preview': s:bin_dir.('preview.sh')}
+
+nnoremap <Leader>d :FZFDirty<CR>
+command! FZFDirty call s:fzf_dirty_files()
+function! s:fzf_dirty_files()
+  let command = 'git status -s | cut -c4-'
+  ""let options = fzf#vim#with_preview('up:80%', '?').options
+  ""let options = ['--preview-window', 'up:80%', '--preview', (fzf#shellescape(s:bin.preview)).' {} | grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git diff -W --color=always {}']
+  let options = ['--preview-window', 'up:80%', '--preview', (fzf#shellescape(s:bin.preview)).' {} | grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git diff --color=always {}']
+
   call fzf#run({
         \ 'source': command,
         \ 'sink':   'e',
-        \ 'options': '-m -x +s',
+        \ 'options': options,
         \ 'window':  'enew' })
+
 endfunction
+
+nnoremap <Leader>f :FZFFilthy<CR>
+command! FZFFilthy call s:fzf_filthy_files()
+function! s:fzf_filthy_files()
+  let command = 'git show --stat --oneline HEAD^ | cut -c4-'
+  let options = ['--preview-window', 'up:80%', '--preview', (fzf#shellescape(s:bin.preview)).' {} | grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git diff --color=always {}']
+
+  call fzf#run({
+        \ 'source': command,
+        \ 'sink':   'e',
+        \ 'options': options,
+        \ 'window':  'enew' })
+
+endfunction
+
+" Another form of FZFDirty
+" nnoremap <Leader>d :Fzfc<CR>
+" command! Fzfc call fzf#run(fzf#wrap(
+"   \ {'source': 'git ls-files --exclude-standard --others --modified'}))
+" noremap <Leader>] :Fzfc<cr>
+
+" " Reads all the files in the git repo. Used for grepping with FZF.
+" nnoremap <C-o> :ModifiedFiles<CR>
+" command! ModifiedFiles execute 'GitFiles' s:files_modified_in_last_commit()
+" function! s:files_modified_in_last_commit()
+"   return system('git diff --name-status HEAD HEAD~1')[:-2]
+" endfunction
+
+" command! FZFMru call fzf#run({
+" \  'source':  v:oldfiles,
+" \  'sink':    'e',
+" \  'options': '-m -x +s',
+" \  'down':    '40%'})
+"
+" let g:fzf_layout = { 'down': '~100%' }
+
 
