@@ -1,5 +1,12 @@
 set nocompatible                                                                "This must be first, because it changes other options as a side effect.
 
+"Preload Vim Plug if it doesn't exist
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin('~/.vim/plugged')
 Plug 'airblade/vim-gitgutter'                                                   "Marks diffed lines between last commit in the current file
 Plug 'dikiaap/minimalist'                                                       "Colorscheme
@@ -15,6 +22,20 @@ Plug 'tpope/vim-commentary'                                                     
 Plug 'tpope/vim-eunuch'                                                         "Use :Move :Delete and other command line file commands from within vim
 Plug 'tpope/vim-fugitive'                                                       "Needed to use FZF for branch searching/changing
 Plug 'wincent/terminus'                                                         "Switches the cursor depending on if you're in insert/normal/replace mode
+Plug 'itspriddle/ZoomWin'                                                       "Lets ctrl-w o reverse itself
+Plug 'dkprice/vim-easygrep'                                                     "Find and replace
+Plug 'idanarye/vim-merginal'
+Plug 'zxqfl/tabnine-vim'
+Plug 'owickstrom/vim-colors-paramount'
+Plug 'pbrisbin/vim-colors-off'
+" Plug 'morhetz/gruvbox'
+"Plug 'chriskempson/base16-vim'
+Plug 'andreypopp/vim-colors-plain'
+Plug 'sjl/badwolf'
+Plug 'KabbAmine/yowish.vim'
+Plug 'mhartington/oceanic-next'
+Plug 'rhysd/committia.vim'
+Plug 'rhysd/git-messenger.vim'
 call plug#end()
 
 
@@ -22,14 +43,37 @@ call plug#end()
 
 let g:hardtime_default_on = 1                                                   "Prevents you from using HJKL all the time (on)
 
-"Allows Easymotion to be called with 's'
-nmap s <Plug>(easymotion-s)
+"Allows Easymotion
+let g:EasyMotion_do_mapping = 0                                                 " Disable default mappings
+let g:EasyMotion_smartcase = 1                                                  " Lets you search for lowercase and it will match uppercase letters
+let g:EasyMotion_use_smartsign_us = 1                                           " Lets you search with '5' if you want a '%' kind of like smart case, treats the symbols as uppercase numbers
+nmap s <Plug>(easymotion-overwin-f)
+vmap s <Plug>(easymotion-overwin-f)
+nmap f <Plug>(easymotion-bd-w)
+vmap f <Plug>(easymotion-bd-w)
 
 " ======================== Vim Basic Config =================================
 
-colorscheme minimalist                                                          "Active colorscheme
+set statusline+=%F
+"colorscheme minimalist                                                          "Active colorscheme
+"colorscheme paramount                                                           "Active colorscheme
+set t_Co=256
+" if (has("termguicolors"))
+"   set termguicolors
+" endif
+set t_md=                                                                       "Disable Annoying Bolds in OceanicNext
+colorscheme OceanicNext
+"colorscheme off                                                           "Active colorscheme
+"colorscheme goodwolf
+"colorscheme yowish
+"colorscheme plain
+"colorscheme base16-grayscale-dark                                                           "Active colorscheme
+"colorscheme base16-google-dark
+"colorscheme gruvbox
+"colorscheme base16-default-dark
 filetype plugin indent on                                                       "Guesses filetype for syntax highlighting and intentation on file load
-let mapleader=""                                                              "Maps the leader key to 'Enter'
+" let mapleader=""                                                              "Maps the leader key to 'Enter'
+nnoremap <CR> :noh<CR><CR>
 set lazyredraw                                                                  "Do not redraw on registers and macros
 set nostartofline                                                               "Jump to first non-blank character when entering new line
 set noswapfile                                                                  "Don't store swap files
@@ -42,9 +86,6 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
 set splitright
-nnoremap <C-Q> :hide<CR>
-nnoremap <C-F> :vsplit<CR>
-
 set ignorecase
 set smartcase
 
@@ -60,7 +101,7 @@ set shiftwidth=2
 set shiftround
 set expandtab
 
-set scrolloff=15
+" set scrolloff=15
 set nowrap
 set clipboard=unnamed
 
@@ -90,12 +131,12 @@ command! -bang -nargs=? -complete=dir GitFiles
 
 " FZF all the definition tags in the git repo
 nnoremap <C-t> :Tags<CR>
-command! -bang -nargs=? -complete=dir Tags
-  \ call fzf#vim#tags(<q-args>, fzf#vim#with_preview('right:60%'), <bang>0)
+" Don't know how to get preview from this
+" command! -bang -nargs=? -complete=dir Tags
+"   \ call fzf#vim#tags(<q-args>, fzf#vim#with_preview('right:60%'), <bang>0)
 
 " FZF all the CONTENTS of the files in the git repo
 nmap ; :GitGrep<CR>
-nnoremap <Leader>g :GitGrep<Cr>
 command! -bang -nargs=* GitGrep
   \ call fzf#vim#ag(<q-args>,
   \  fzf#vim#with_preview({
@@ -106,29 +147,37 @@ command! -bang -nargs=* GitGrep
   \  <bang>0)
 
 " FZF the files in the current folder
-nnoremap <Leader>a :FZFAdjacent<CR>
-command! FZFAdjacent call s:fzf_neighbouring_files()
+" nnoremap <C-x> :BTags<CR>
+nnoremap <C-x> :FZFNeigh<CR>
+command! FZFNeigh call s:fzf_neighbouring_files()
 function! s:fzf_neighbouring_files()
-  let command = 'rg --hidden --no-heading --smart-case --fixed-strings --files --maxdepth 1 | sort'
-  let options = fzf#vim#with_preview('right:60%', '?').options
+  let current_file =expand("%")
+  let cwd = fnamemodify(current_file, ':p:h')
+  let command = 'ag -g "" -f ' . cwd . ' --depth 0'
+
   call fzf#run({
         \ 'source': command,
         \ 'sink':   'e',
-        \ 'options': options,
+        \ 'options': '-m -x +s',
         \ 'window':  'enew' })
 endfunction
 
-nnoremap <Leader>b :Gbranch<CR>
-command! -bang Gbranch call fzf#run({
-            \ 'source': 'git branch -a --no-color | grep -v "^\* " ',
-            \ 'sink': function('s:changebranch')
-            \ })
-function! s:changebranch(branch)
-    execute 'Git checkout' . a:branch
-    call feedkeys("i")
-endfunction
+" command! -bang -nargs=? -complete=dir FZFNeigh
+"   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:60%'), <bang>0)
 
+nnoremap <C-a>c :BCommits<CR>
 nnoremap <C-b> :Buffers<CR>
+
+" nnoremap <Leader>b :Gbranch<CR>
+" command! -bang Gbranch call fzf#run({
+"             \ 'source': 'git branch -a --no-color | grep -v "^\* " ',
+"             \ 'sink': function('s:changebranch')
+"             \ })
+" function! s:changebranch(branch)
+"     execute 'Git checkout' . a:branch
+"     call feedkeys("i")
+" endfunction
+
 
 " ====================== Git Gutter =======================================
 
@@ -233,7 +282,7 @@ set laststatus=0
 set noshowcmd                                                                   "Show incomplete cmds down the bottom
 set gdefault                                                                    "Set global flag for search and replace
 set gcr=a:blinkon500-blinkwait500-blinkoff500                                   "Set cursor blinking rate
-set cursorline                                                                  "Highlight current line
+" set cursorline                                                                  "Highlight current line
 set mouse=a                                                                     "Enable mouse
 set timeoutlen=1000 ttimeoutlen=200                                             "Reduce Command timeout for faster escape and O
 set laststatus=2                                                                "Show statusbar
@@ -276,7 +325,6 @@ set colorcolumn=80
 "" colorscheme nord
 ""colorscheme jellybeans
 "let g:airline_theme='angr'
-" colorscheme base16-google-dark
 
 
 " let g:sidepanel_pos = "left"
@@ -328,14 +376,13 @@ nnoremap <Leader>T <C-t>
 ""nnoremap <Leader>d :Gdiff<CR>
 ""nnoremap <Leader>D :Gdiff HEAD^<CR>
 " nnoremap <C-s> :Goyo<CR>
-nnoremap <Leader>c :BCommits<CR>
+nnoremap <C-c> :BCommits<CR>
 
 "nnoremap <Leader>b :BLines<CR>
 
 
 
 
-nnoremap <C-x> :BTags<CR>
 
 
 ""rg -g '*.{toml,md,yml}' -c ripgrep
@@ -407,5 +454,3 @@ endfunction
 " \  'down':    '40%'})
 "
 " let g:fzf_layout = { 'down': '~100%' }
-
-

@@ -88,6 +88,7 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias gca='git commit --amend'
 alias vimscreen='screen -x centralvim'
 alias gerritTraffickingPush='~/Scripts/GIT/pushGerritTrafficking.sh'
 alias gerritInventoryPush='~/Scripts/GIT/pushInventoryTrafficking.sh'
@@ -196,16 +197,25 @@ gh() {
 }
 
 fzf_dirty_files() {
-  git status --porcelain | cut -c 1,2,3 --complement | fzf --multi --preview-window=up:50% --preview='git diff --color=always {}'
+  git status --porcelain | cut -c 1,2,3 --complement | fzf --multi --preview-window=up:50% --preview='git diff -W --color=always {}'
 }
 
 fzf_last_commit_dirty_files() {
-  git status --porcelain | cut -c 1,2,3 --complement | fzf --multi --preview-window=up:50% --preview='git diff HEAD\^ --color=always {}'
+  git show --porcelain | cut -c 1,2,3 --complement | fzf --multi --preview-window=up:50% --preview='git diff -W --color=always {}'
+}
+
+# fbr - checkout git branch (including remote branches), sorted by most recent commit, limit 30 last branches
+fbr() {
+  local branches branch
+  branches=$(git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)") &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 
 bind '"\er": redraw-current-line'
 bind '"\C-g\C-f": "$(gf)\e\C-e\er"'
-bind '"\C-g\C-b": "$(gb)\e\C-e\er"'
+bind '"\C-g\C-b": "$(fbr)\e\C-e\er"'
 bind '"\C-g\C-t": "$(gt)\e\C-e\er"'
 bind '"\C-g\C-h": "$(gh)\e\C-e\er"'
 bind '"\C-g\C-g": "$(fzf_dirty_files)\e\C-e\er"'
@@ -216,3 +226,9 @@ export FZF_DEFAULT_COMMAND='
   (git ls-tree -r --name-only HEAD ||
    find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
       sed s/^..//) 2> /dev/null'
+
+export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
+export FZF_ALT_C_COMMAND="rg --sort-files --files --null 2> /dev/null | xargs -0 dirname | uniq".
+
+export PATH=$PATH:~/vistar/tools/buildifier
+alias cat='bat'
