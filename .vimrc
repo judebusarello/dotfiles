@@ -1,383 +1,182 @@
-"*****************************************************************************
-"" NeoBundle core
-"*****************************************************************************
+set nocompatible                                                                "This should be the first line
 
-if has('vim_starting')
-  set nocompatible               " Be iMproved
+" ================ Persistent Undo ==================
 
-  " Required:
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
-endif
+" Keep undo history across sessions, by storing in file.
+silent !mkdir ~/.vim/backups > /dev/null 2>&1
+set undodir=~/.vim/backups
+set undofile
 
-let neobundle_readme=expand('~/.vim/bundle/neobundle.vim/README.md')
+" ============= Basic Settings =============================================
+" Terminal To Use In NVIM
+set shell=/bin/zsh
+let $SHELL = "/bin/zsh"
+:tnoremap <Esc> <C-\><C-n>                                                      "Esc exits the terminal pane in neovim
 
-if !filereadable(neobundle_readme)
-  echo "Installing NeoBundle..."
-  echo ""
-  silent !mkdir -p ~/.vim/bundle
-  silent !git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim/
-  let g:not_finsh_neobundle = "yes"
+" ================ General Config ====================
+"
+" Move between panes with ctrl-[hjkl]
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
-  " Run shell script if exist on custom select language
+" Default new splits to the right
+set splitright
 
-endif
-
-" Required:
-call neobundle#begin(expand('~/.vim/bundle/'))
-
-" Let NeoBundle manage NeoBundle
-" Required:
-NeoBundleFetch 'Shougo/neobundle.vim'
-
-"*****************************************************************************
-"" NeoBundle install packages
-"*****************************************************************************
-NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'tpope/vim-commentary'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'ctrlpvim/ctrlp.vim'
-NeoBundle 'bling/vim-airline'
-NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'sheerun/vim-polyglot'
-NeoBundle 'vim-scripts/grep.vim'
-NeoBundle 'vim-scripts/CSApprox'
-NeoBundle 'bronson/vim-trailing-whitespace'
-NeoBundle 'Shougo/vimproc.vim', {
-      \ 'build' : {
-      \     'windows' : 'tools\\update-dll-mingw',
-      \     'cygwin' : 'make -f make_cygwin.mak',
-      \     'mac' : 'make -f make_mac.mak',
-      \     'unix' : 'make -f make_unix.mak',
-      \    },
-      \ }
-NeoBundle 'Shougo/vimshell.vim'
-
-"" Snippets
-NeoBundle 'SirVer/ultisnips'
-NeoBundle 'honza/vim-snippets'
-
-"" Color
-NeoBundle 'tomasr/molokai'
-
-"" Vim-Bootstrap Updater
-NeoBundle 'sherzberg/vim-bootstrap-updater'
-
-let g:vim_bootstrap_langs = ""
-let g:vim_bootstrap_editor = "vim"				" nvim or vim
-
-"" Custom bundles
-
-
-"" Include user's extra bundle
-if filereadable(expand("~/.vimrc.local.bundles"))
-  source ~/.vimrc.local.bundles
-endif
-
-call neobundle#end()
-
-" Required:
-filetype plugin indent on
-
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
-NeoBundleCheck
-
-"*****************************************************************************
-"" Basic Setup
-"*****************************************************************************"
-"" Encoding
-set encoding=utf-8
-set fileencoding=utf-8
-set fileencodings=utf-8
-
-"" Fix backspace indent
-set backspace=indent,eol,start
-
-"" Tabs. May be overriten by autocmd rules
-set tabstop=4
-set softtabstop=0
-set shiftwidth=4
-set expandtab
-
-"" Map leader to ,
-let mapleader=','
-
-"" Enable hidden buffers
-set hidden
-
-"" Searching
-set hlsearch
-set incsearch
-set ignorecase
+" Search without worrying about case unless specifically typing capital letters
 set smartcase
 
-"" Encoding
-set bomb
-set binary
-set ttyfast
+"Prevent x from overwriting the clipboard selection
+noremap x "_x
+noremap X "_X
 
-"" Directories for swp files
-set nobackup
-set noswapfile
-
-set fileformats=unix,dos,mac
-set showcmd
-set shell=/bin/sh
-
-"*****************************************************************************
-"" Visual Settings
-"*****************************************************************************
-syntax on
-"set ruler
-"set number
-
-let no_buffers_menu=1
-if !exists('g:not_finsh_neobundle')
-  colorscheme desert
-endif
-
-set mousemodel=popup
+filetype plugin indent on                                                       "Guesses filetype for syntax highlighting and intentation on file load
+nnoremap <CR> :noh<CR><CR>
+nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR> "space clears the search
+set autochdir
+set backspace=indent,eol,start                                                  "Allow backspace in insert mode
+set clipboard=unnamedplus
+set colorcolumn=80
+set completeopt-=preview                                                        "Disable preview for autocomplete
+set expandtab
+set fileencoding=utf-8 encoding=utf-8                                           "Set utf-8 encoding on write
+set gcr=a:blinkon500-blinkwait500-blinkoff500                                   "Set cursor blinking rate
+set gdefault                                                                    "Set global flag for search and replace
+set hidden
+set history=500                                                                 "Store lots of :cmdline history
+set hlsearch
+set incsearch
+set laststatus=2                                                                "Show statusbar
+set lazyredraw                                                                  "Do not redraw on registers and macros. Helps with big macros on big files.
+set linebreak                                                                   "Wrap lines at convenient points
+set list                                                                        "Enable listchars
+set listchars=tab:\ \ ,trail:·                                                  "Set trails for tabs and spaces
+set mouse=a                                                                     "Enable mouse
+set noruler
+set noshowcmd                                                                   "Show incomplete cmds down the bottom
+set noshowmode                                                                  "Hide showmode because of the powerline plugin
+set nostartofline                                                               "Jump to first non-blank character when entering new line
+set noswapfile                                                                  "Don't store swap files
+set nowrap
+set number
+set shiftround
+set shiftwidth=2
+set showmatch                                                                   "Highlight matching bracket
 set t_Co=256
-set nocursorline
-set guioptions=egmrti
-set gfn=Monospace\ 10
+set tabstop=2
+set timeoutlen=1000 ttimeoutlen=200                                             "Reduce Command timeout for faster escape and O
+syntax on                                                                       "Syntax highlighting (on)
 
-if has("gui_running")
-  if has("gui_mac") || has("gui_macvim")
-    set guifont=Menlo:h12
-    set transparency=7
-  endif
-else
-  let g:CSApprox_loaded = 1
-
-  if $COLORTERM == 'gnome-terminal'
-    set term=gnome-256color
-  else
-    if $TERM == 'xterm'
-      set term=xterm-256color
-    endif
-  endif
-endif
-
-if &term =~ '256color'
-  set t_ut=
-endif
-
-"" Disable the blinking cursor.
-set gcr=a:blinkon0
-set scrolloff=3
-
-"" Status bar
-""set laststatus=2
-
-"" Use modeline overrides
-set modeline
-set modelines=10
-
-set title
-set titleold="Terminal"
-set titlestring=%F
-
-"set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\
-
-"if exists("*fugitive#statusline")
-"  set statusline+=%{fugitive#statusline()}
-"endif
-
-"let g:airline_theme = 'powerlineish'
-"let g:airline#extensions#branch#enabled = 1
-"let g:airline#extensions#tabline#enabled = 1
-"let g:airline#extensions#tabline#left_sep = ''
-"let g:airline#extensions#tabline#left_alt_sep = ''
-
-"if !exists('g:airline_symbols')
-"	let g:airline_symbols = {}
-"endif
-
-" powerline symbols
-"let g:airline_left_sep = ''
-"let g:airline_left_alt_sep = ''
-"let g:airline_right_sep = ''
-"let g:airline_right_alt_sep = ''
-"let g:airline_symbols.branch = ''
-"let g:airline_symbols.readonly = ''
-"let g:airline_symbols.linenr = ''
-
-"*****************************************************************************
-"" Abbreviations
-"*****************************************************************************
-"" no one is really happy until you have this shortcuts
-cnoreabbrev W! w!
-cnoreabbrev Q! q!
-cnoreabbrev Qall! qall!
-cnoreabbrev Wq wq
-cnoreabbrev Wa wa
-cnoreabbrev wQ wq
-cnoreabbrev WQ wq
-cnoreabbrev W w
-cnoreabbrev Q q
-cnoreabbrev Qall qall
-
-"" NERDTree configuration
-"let g:NERDTreeChDirMode=2
-"let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
-"let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
-"let g:NERDTreeShowBookmarks=1
-"let g:nerdtree_tabs_focus_on_files=1
-"let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
-"let g:NERDTreeWinSize = 20
-"set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
-"nnoremap <silent> <F2> :NERDTreeFind<CR>
-noremap <F3> :NERDTreeToggle<CR>
-
-" grep.vim
-nnoremap <silent> <leader>f :Rgrep<CR>
-let Grep_Default_Options = '-IR'
-
-" vimshell
-let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
-let g:vimshell_prompt =  '$ '
-hnoremap <silent> <leader>sh :VimShellCreate<CR>
-
-"*****************************************************************************
-"" Functions
-"*****************************************************************************
-if !exists('*s:setupWrapping')
-  function s:setupWrapping()
-    set wrap
-    set wm=2
-    set textwidth=79
-  endfunction
-endif
-
-"*****************************************************************************
-"" Autocmd Rules
-"*****************************************************************************
-"" The PC is fast enough, do syntax highlight syncing from start
-augroup vimrc-sync-fromstart
-  autocmd!
-  autocmd BufEnter * :syntax sync fromstart
-augroup END
-
-"" Remember cursor position
-augroup vimrc-remember-cursor-position
-  autocmd!
-  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-augroup END
-
-"" txt
-augroup vimrc-wrapping
-  autocmd!
-  autocmd BufRead,BufNewFile *.txt call s:setupWrapping()
-augroup END
-
-"" make/cmake
-augroup vimrc-make-cmake
-  autocmd!
-  autocmd FileType make setlocal noexpandtab
-  autocmd BufNewFile,BufRead CMakeLists.txt setlocal filetype=cmake
-augroup END
-
+"" The lines below will refresh buffers according to the file on disk when you
+"" switch over. Autoread doesn't flipping work in the terminal so you need the
+"" hack
 set autoread
+au FocusGained,BufEnter * :silent! !
 
-"*****************************************************************************
-"" Mappings
-"*****************************************************************************
-"" Split
-noremap <Leader>h :<C-u>split<CR>
-noremap <Leader>v :<C-u>vsplit<CR>
+" ============= Plugins ====================================================
 
-"" Git
-noremap <Leader>ga :Gwrite<CR>
-noremap <Leader>gc :Gcommit<CR>
-noremap <Leader>gsh :Gpush<CR>
-noremap <Leader>gll :Gpull<CR>
-noremap <Leader>gs :Gstatus<CR>
-noremap <Leader>gb :Gblame<CR>
-noremap <Leader>gd :Gvdiff<CR>
-noremap <Leader>gr :Gremove<CR>
-
-"" Tabs
-nnoremap <Tab> gt
-nnoremap <S-Tab> gT
-nnoremap <silent> <S-t> :tabnew<CR>
-
-"" Set working directory
-nnoremap <leader>. :lcd %:p:h<CR>
-
-"" Opens an edit command with the path of the currently edited file filled in
-noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
-
-"" Opens a tab edit command with the path of the currently edited file filled
-noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
-
-"" ctrlp.vim
-set wildmode=list:longest,list:full
-set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__
-let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn|tox)$'
-let g:ctrlp_user_command = "find %s -type f | grep -Ev '"+ g:ctrlp_custom_ignore +"'"
-let g:ctrlp_use_caching = 0
-cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
-noremap <leader>b :CtrlPBuffer<CR>
-let g:ctrlp_map = ',e'
-let g:ctrlp_open_new_file = 'r'
-
-" snippets
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<c-b>"
-let g:UltiSnipsEditSplit="vertical"
-
-" syntastic
-let g:syntastic_always_populate_loc_list=1
-let g:syntastic_error_symbol='✗'
-let g:syntastic_warning_symbol='⚠'
-let g:syntastic_style_error_symbol = '✗'
-let g:syntastic_style_warning_symbol = '⚠'
-let g:syntastic_auto_loc_list=1
-let g:syntastic_aggregate_errors = 1
-
-" vim-airline
-" let g:airline#extensions#syntastic#enabled = 1
-
-"" Copy/Paste/Cut
-if has('unnamedplus')
-  set clipboard=unnamed,unnamedplus
+" Download Vim Plug if it needs downloading
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-noremap YY "+y<CR>
-noremap P "+gP<CR>
-noremap XX "+x<CR>
+" External Plugins
+call plug#begin('~/.vim/plugged')
+Plug 'airblade/vim-gitgutter'                                                   "Marks diffed lines between last commit in the current file
+Plug 'https://github.com/neoclide/coc.nvim', {'branch': 'release'}              "language server client/fzf tie-in for file searching
+Plug 'https://github.com/ryanoasis/vim-devicons'                                "language logos per-filetype in fzf search windows
+Plug 'joshdick/onedark.vim'                                                     "Colorscheme
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }                             "file navigation/general fuzzy finder
+Plug 'junegunn/fzf.vim'
+Plug 'kchmck/vim-coffee-script'                                                 "Coffeescript syntax highlighting
+Plug 'leafgarland/typescript-vim'                                               "Typescript syntax highlighting
+Plug 'rhysd/git-messenger.vim'                                                  "Floating Git-Blame Window in Nvim with ctrl-b
+Plug 'tpope/vim-commentary'                                                     "Hit g,c to comment or uncomment a block of code
+Plug 'tpope/vim-fugitive'                                                       "Needed to use FZF for branch searching/changing
+call plug#end()
 
-if has('macunix')
-  " pbcopy for OSX copy/paste
-  vmap <C-x> :!pbcopy<CR>
-  vmap <C-c> :w !pbcopy<CR><CR>
-endif
+" Extensions to the Language Server
+let g:coc_global_extensions = [
+  \  'coc-fzf-preview',
+  \  'coc-go',
+  \  'coc-java',
+  \  'coc-python',
+  \  'coc-tsserver',
+  \  'coc-sql',
+  \  'coc-json',
+  \  'coc-html',
+  \  'coc-sh',
+  \]
 
-"" Buffer nav
-noremap <leader>z :bp<CR>
-noremap <leader>q :bp<CR>
-noremap <leader>x :bn<CR>
-noremap <leader>w :bn<CR>
+" ====================== Color Scheme =====================================
 
-"" Close buffer
-noremap <leader>c :bd<CR>
+set t_Co=256                                                                    "Set 256 colors
+colorscheme onedark                                                             "Colorscheme that looks like VSCode
 
-"" Clean search (highlight)
-nnoremap <silent> <leader><space> :noh<cr>
+" ====================== Git Gutter =======================================
 
-"" Vmap for maintain Visual Mode after shifting > and <
-vmap < <gv
-vmap > >gv
+" GitGutter styling to use · instead of +/-
+let g:gitgutter_sign_added = '◆'
+let g:gitgutter_sign_modified = '◆'
+let g:gitgutter_sign_modified_removed = '◆'
+let g:gitgutter_sign_removed = '◆'
+let g:gitgutter_sign_removed_first_line = '◆'
 
-"" Open current line on GitHub
-noremap ,o :!echo `git url`/blob/`git rev-parse --abbrev-ref HEAD`/%\#L<C-R>=line('.')<CR> \| xargs open<CR><CR>
+" =================== Git Messenger =======================================
+"
+" Git Blame a current line Using CTRL-b
+nnoremap <C-b> :GitMessenger<CR>
 
-"" Custom configs
+" =================== CoC Language Server =================================
+"
+" Next and Prev error with ctrl-g
+nnoremap <C-g> :call CocAction('diagnosticNext')<CR>
 
+" Jump to the definition with ctrl-t
+nnoremap <C-t> :call CocAction('jumpDefinition', 'vsplit')<CR>
 
-"" Include user's local vim config
-if filereadable(expand("~/.vimrc.local"))
-  source ~/.vimrc.local
-endif
+" search the git repo for a filename
+nnoremap <silent><nowait> <C-p> :CocCommand fzf-preview.FromResources git<CR>
+
+" Fuzzy Find all the places a given symbol is referenced
+nnoremap <silent><nowait> <C-s> :CocCommand fzf-preview.CocReferences<CR>
+
+" Show when coc is initiallizing the whatever
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" ================= FZF Native =============================================
+" FZF all the CONTENTS of the files in the git repo
+nmap ; :GitGrep<CR>
+command! -bang -nargs=* GitGrep
+  \ call fzf#vim#ag(<q-args>,
+  \  fzf#vim#with_preview({
+  \    'options': '--no-hscroll --delimiter : --nth 4..',
+  \    'dir': systemlist('git rev-parse --show-toplevel')[0]},
+  \    'right:50%'
+  \  ),
+  \  <bang>0)
+
+" ==================== FZF Preview ========================================
+"
+function! s:find_git_root()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
+let g:fzf_preview_directory_files_command = 'rg --files --hidden --follow --no-messages ' . s:find_git_root() " Installed ripgrep
+let g:fzf_preview_git_files_command = 'rg --files --hidden --follow --no-messages ' . s:find_git_root() " Installed ripgrep
+let g:fzf_preview_grep_cmd = 'rg --line-number --no-heading --color=never'
+
+" Use vim-devicons in the filesearch window
+let g:fzf_preview_use_dev_icons = 1
+let g:fzf_preview_dev_icon_prefix_length = 2
+let g:fzf_preview_dev_icons_limit = 100000
+
+" jump to the buffers by default when possible
+let g:fzf_preview_buffers_jump = 1
+
+" floating window size ratio
+let g:fzf_preview_floating_window_rate = 0.7
+
