@@ -25,6 +25,8 @@ nnoremap <C-H> <C-W><C-H>
 set splitright
 
 " Search without worrying about case unless specifically typing capital letters
+" Need both ignore and smartcase
+set ignorecase
 set smartcase
 
 "Prevent x from overwriting the clipboard selection
@@ -96,6 +98,7 @@ Plug 'leafgarland/typescript-vim'                                               
 Plug 'rhysd/git-messenger.vim'                                                  "Floating Git-Blame Window in Nvim with ctrl-b
 Plug 'tpope/vim-commentary'                                                     "Hit g,c to comment or uncomment a block of code
 Plug 'tpope/vim-fugitive'                                                       "Needed to use FZF for branch searching/changing
+Plug 'voldikss/vim-floaterm'                                                    "Floating Terminal
 call plug#end()
 
 " Extensions to the Language Server
@@ -105,7 +108,6 @@ let g:coc_global_extensions = [
   \  'coc-java',
   \  'coc-python',
   \  'coc-tsserver',
-  \  'coc-sql',
   \  'coc-json',
   \  'coc-html',
   \  'coc-sh',
@@ -138,17 +140,15 @@ nnoremap <C-g> :call CocAction('diagnosticNext')<CR>
 " Jump to the definition with ctrl-t
 nnoremap <C-t> :call CocAction('jumpDefinition', 'vsplit')<CR>
 
-" search the git repo for a filename
-nnoremap <silent><nowait> <C-p> :CocCommand fzf-preview.FromResources git<CR>
 
 " Fuzzy Find all the places a given symbol is referenced
-nnoremap <silent><nowait> <C-s> :CocCommand fzf-preview.CocReferences<CR>
+nnoremap <silent> <C-s> :CocCommand fzf-preview.CocReferences<CR>
 
 " Show when coc is initiallizing the whatever
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}%F
 
 " ================= FZF Native =============================================
-" FZF all the CONTENTS of the files in the git repo
+" Search the contents of all the files in the git repo
 nmap ; :GitGrep<CR>
 command! -bang -nargs=* GitGrep
   \ call fzf#vim#ag(<q-args>,
@@ -159,24 +159,62 @@ command! -bang -nargs=* GitGrep
   \  ),
   \  <bang>0)
 
-" ==================== FZF Preview ========================================
+" search the contents of uncommitted files and files in the previous commit
+" let preview = printf('git diff --color=always -- {-2} | sed 1,4d', s:bin.preview)
+" nnoremap <silent> <C-\> :GitGrepCurrentCommit<CR>
+" command! -bang -nargs=* GitGrepCurrentCommit
+"   \ call fzf#vim#gitfiles('?',
+"   \  {
+"   \    'source': 'git diff --name-only HEAD^',
+"   \    'sink': 'e',
+"   \    'options': ['--no-hscroll', '--delimiter', ':', '--preview', 'if [[ {1} =~ M ]]; then %s; else %s {-1}; fi; git diff --color=always HEAD^'],
+"   \    'dir': systemlist('git rev-parse --show-toplevel')[0]
+"   \  }),
+"   \  <bang>0)
+
+" nnoremap <silent> <C-\> :GitGrepCurrentCommit<CR>
+" command! -bang -nargs=* GitGrepCurrentCommit
+"   \ call fzf#vim#gitfiles('?',
+"   \  fzf#vim#with_preview({
+"   \    'source': 'git diff --name-only HEAD^',
+"   \    'sink': 'e',
+"   \    'options': '--no-hscroll --delimiter : --nth 4..',
+"   \    'dir': systemlist('git rev-parse --show-toplevel')[0]},
+"   \    'right:50%'
+"   \  ),
+"   \  <bang>0)
+
+" search the git repo for a filename
+nnoremap <silent> <C-p> :GF<CR>
+
+" search modified files
+nnoremap <silent> <C-\> :GF?<CR>
+
+" ================= Floaterm  =============================================
 "
-function! s:find_git_root()
-  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
-endfunction
+" Terminals to toggle in vim. Use ctrl-7, ctrl-8, ctrl-9
+let g:floaterm_width = 0.8
+noremap <C-y> :FloatermToggle term1<CR>
+tnoremap <C-y> <C-\><C-n>:FloatermToggle term1<CR>
+inoremap <C-y> <Esc>:FloatermToggle term1<CR>
+noremap <C-n> :FloatermToggle term2<CR>
+tnoremap <C-n> <C-\><C-n>:FloatermToggle term2<CR>
+inoremap <C-n> <Esc>:FloatermToggle term2<CR>
+" noremap <C-8> :FloatermToggle term2<CR>
+" noremap <C-9> :FloatermToggle term3<CR>
+" tnoremap <C-8> <C-\><C-n>:FloatermToggle term2<CR>
+" tnoremap <C-9> <C-\><C-n>:FloatermToggle term3<CR>
+" inoremap <C-8> <Esc>:FloatermToggle term2<CR>
+" inoremap <C-9> <Esc>:FloatermToggle term3<CR>
 
-let g:fzf_preview_directory_files_command = 'rg --files --hidden --follow --no-messages ' . s:find_git_root() " Installed ripgrep
-let g:fzf_preview_git_files_command = 'rg --files --hidden --follow --no-messages ' . s:find_git_root() " Installed ripgrep
-let g:fzf_preview_grep_cmd = 'rg --line-number --no-heading --color=never'
+" let g:floaterm_wintype = 'split'
+" let g:floaterm_position = 'rightbelow'
 
-" Use vim-devicons in the filesearch window
-let g:fzf_preview_use_dev_icons = 1
-let g:fzf_preview_dev_icon_prefix_length = 2
-let g:fzf_preview_dev_icons_limit = 100000
+" ================= Run Tests =============================================
+" nnoremap <silent><nowait> <C-t> :term ~/docker-compose/dc-run inventory_api bazel test . <CR>
+"
+noremap <C-w> <Esc>:W<CR>
 
-" jump to the buffers by default when possible
-let g:fzf_preview_buffers_jump = 1
-
-" floating window size ratio
-let g:fzf_preview_floating_window_rate = 0.7
-
+nnoremap <silent> <C-0> :tabm 0<CR>
+nnoremap <silent> <C-1> :tabm 1<CR>
+nnoremap <silent> <C-2> :tabm 2<CR>
