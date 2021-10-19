@@ -1,0 +1,28 @@
+[user]
+	email = jude.busarello@vistarmedia.com
+	name = Jude Busarello
+[init]
+	templatedir = ~/.git_template
+[push]
+	default = simple
+[alias]
+	ctags = !.git/hooks/ctags
+	gerrit = "!git-review -d "
+  autogerrit = "!f() { \
+    mkdir ~/auto-vistar/$1; \
+    cd ~/auto-vistar/$1; \
+    git clone 'ssh://jbusarello@src.vistarmedia.com:29418/vistar';  \
+    cd ~/auto-vistar/$1/vistar; \
+    git-review -d $1; \
+    COMMIT_MESSAGE=$(git log --pretty=format:%s -n 1 HEAD); \
+    FOLDER_NAME=$(echo $COMMIT_MESSAGE | sed -e s/[^A-Za-z0-9.]/_/g); \
+    mv ~/auto-vistar/$1/vistar ~/auto-vistar/$FOLDER_NAME; \
+    rm -d ~/auto-vistar/$1; \
+  }; f"
+	co = checkout
+[color "grep"]
+    linenumber = yellow bold
+    match = red
+    filename = magenta
+[gitreview]
+	username = jbusarello
