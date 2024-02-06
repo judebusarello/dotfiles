@@ -1,0 +1,46 @@
+prSections:
+- title: Review Requested
+  filters: is:open is:pr review-requested:@me archived:false draft:false status:success
+- title: Failing Jenkins
+  filters: is:open author:@me status:failure
+- title: Changes Requested
+  filters: is:open author:@me review:changes-requested 
+- title: Review Done
+  filters: is:open is:pr reviewed-by:@me
+
+defaults:
+  preview:
+    open: true
+    width: 125
+  prsLimit: 20
+  issuesLimit: 20
+  view: prs
+  layout:
+    prs:
+      updatedAt:
+        width: 7
+      author:
+        width: 15
+      assignees:
+        width: 20
+        hidden: false
+      base:
+        width: 15
+        hidden: true
+      lines:
+        width: 16
+  refetchIntervalMinutes: 30
+keybindings:
+  issues: []
+  prs:
+    - key: o
+      command: >
+        nvr --remote-send '<S-esc>:Octo pr edit {{.PrNumber}}<cr>'
+repoPaths:
+  Vistar-Media/*: ~/*
+theme:
+  ui:
+    table:
+      showSeparator: true
+pager:
+  diff: ""
